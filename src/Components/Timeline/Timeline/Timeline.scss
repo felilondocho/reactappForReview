@@ -1,0 +1,8 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+}
