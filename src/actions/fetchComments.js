@@ -2,46 +2,48 @@ import {
   REQUEST_COMMENTS,
   SUCCESS_FETCH_COMMENTS,
   FAIL_FETCH_COMMENTS,
-} from '../actions/actionTypes';
+} from './actionTypes';
 
 import JWB_AUTH from '../lib/jwt_auth';
 
-var jwt_instance = new JWB_AUTH();
+let requestComments;
+let successfulFetchComments;
+let failedFetchComments;
 
-export function fetchComments(postId) {
-  return dispatch => {
+export default function fetchComments(postId) {
+  return ((dispatch) => {
     dispatch(requestComments());
-    return fetch("http://localhost:3000/getComments/", {
+    return fetch('http://localhost:3000/getComments/', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': jwt_instance.getToken(),
+        Authorization: JWB_AUTH.getToken(),
       },
       body: JSON.stringify(postId),
     })
-    .then(response => Promise.all([response.ok, response.json()]))
-    .then(([responseOk, body]) => {
-      if (responseOk) {
-        dispatch(successfulFetchComments(body));
-      } else {
-        dispatch(failedFetchComments(body.error));
-      }
-    })
-    .catch(() => {
-      dispatch(failedFetchComments("Server error"));
-    });
-  };
+      .then(response => Promise.all([response.ok, response.json()]))
+      .then(([responseOk, body]) => {
+        if (responseOk) {
+          dispatch(successfulFetchComments(body));
+        } else {
+          dispatch(failedFetchComments(body.error));
+        }
+      })
+      .catch(() => {
+        dispatch(failedFetchComments('Server error'));
+      });
+  });
 }
 
-const requestComments = () => ({
+requestComments = () => ({
   type: REQUEST_COMMENTS,
 });
 
-const successfulFetchComments = payload => ({
+successfulFetchComments = payload => ({
   type: SUCCESS_FETCH_COMMENTS, payload: { [payload[0].postId]: payload },
 });
 
-const failedFetchComments = error => ({
+failedFetchComments = error => ({
   type: FAIL_FETCH_COMMENTS, payload: error,
 });

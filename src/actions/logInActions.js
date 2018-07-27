@@ -7,49 +7,51 @@ import {
 
 import JWB_AUTH from '../lib/jwt_auth';
 
-var jwt_instance = new JWB_AUTH();
+let sendLogInInfo;
+let successfulLogIn;
+let failedLogIn;
 
 export function logIn(logInInfo) {
-  return dispatch => {
+  return ((dispatch) => {
     dispatch(sendLogInInfo());
-    return fetch("http://localhost:3000/login", {
+    return fetch('http://localhost:3000/login', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(logInInfo),
     })
-    .then(response => Promise.all([response.ok, response.text()]))
-    .then(([responseOk, body]) => {
-      if (responseOk) {
-        dispatch(successfulLogIn(body));
-      } else {
-        dispatch(failedLogIn(body));
-      }
-    })
-    .catch(() => {
-      dispatch(failedLogIn("Server error"));
-    });
-  };
+      .then(response => Promise.all([response.ok, response.text()]))
+      .then(([responseOk, body]) => {
+        if (responseOk) {
+          dispatch(successfulLogIn(body));
+        } else {
+          dispatch(failedLogIn(body));
+        }
+      })
+      .catch(() => {
+        dispatch(failedLogIn('Server error'));
+      });
+  });
 }
 
-const sendLogInInfo = () => ({
+sendLogInInfo = () => ({
   type: LOG_IN_REQUEST,
 });
 
-const successfulLogIn = jwt_id => {
-  jwt_instance.setToken(jwt_id);
-  return { type: LOG_IN_SUCCESSFUL, };
-}
+successfulLogIn = (jwtId) => {
+  JWB_AUTH.setToken(jwtId);
+  return { type: LOG_IN_SUCCESSFUL };
+};
 
-const failedLogIn = error => ({
+failedLogIn = error => ({
   type: LOG_IN_FAIL, payload: error,
 });
 
 export function checkToken() {
   return {
     type: CHECK_INITIAL_TOKEN,
-    payload: jwt_instance.loggedIn(),
+    payload: JWB_AUTH.loggedIn(),
   };
-};
+}

@@ -1,4 +1,4 @@
-import { 
+import {
   SUCCESS_FETCH_POSTS,
   FAIL_FETCH_POSTS,
   REQUEST_POST,
@@ -7,7 +7,7 @@ import {
 const initialState = {
   posts: [],
   isFetching: false,
-  fetchCommentsError: '',
+  fetchError: '',
   currentInitChunk: 0,
   currentEndChunk: 5,
   fetchingMore: false,
@@ -19,10 +19,10 @@ export default function fetchPosts(state = initialState, action) {
       return { ...state, isFetching: true };
     case SUCCESS_FETCH_POSTS:
       return {
-        ...state, 
+        ...state,
         fetchingMore: true,
-        isFetching: false, 
-        fetchCommentsError: '',
+        isFetching: false,
+        fetchError: '',
         posts: [...state.posts, ...action.payload],
         currentInitChunk: state.currentInitChunk + 5,
         currentEndChunk: state.currentEndChunk + 5,
@@ -31,7 +31,7 @@ export default function fetchPosts(state = initialState, action) {
       return {
         ...state,
         isFetching: false,
-        fetchCommentsError: action.payload,
+        fetchError: action.payload,
       };
     default:
       return state;

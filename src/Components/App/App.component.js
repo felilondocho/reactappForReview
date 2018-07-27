@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert } from 'antd';
+import PropTypes from 'prop-types';
 
 import styles from './App.scss';
 import Header from '../Header';
@@ -22,10 +23,6 @@ const logInErrorBlock = logInError => (
 );
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
     const { checkToken } = this.props;
     checkToken();
@@ -35,16 +32,26 @@ class App extends React.Component {
     const { loggedIn, logInError, logInLoading } = this.props;
     const displayLoader = !logInError && logInLoading;
     const displayLoggedInContent = !logInError && !logInLoading && loggedIn;
-    
     return (
       <div className={styles.mainApp}>
         {logInError && (logInErrorBlock(logInError)) }
-        {displayLoader && (<h1>Signing in...</h1>) }
+        {displayLoader && (
+          <h1>
+            Signing in...
+          </h1>
+        )}
         {displayLoggedInContent && (LoggedInBlock())}
-        {!loggedIn && <UserForm/>}
+        {!loggedIn && <UserForm />}
       </div>
     );
   }
 }
+
+App.propTypes = {
+  checkToken: PropTypes.func.isRequired,
+  loggedIn: PropTypes.bool.isRequired,
+  logInError: PropTypes.string.isRequired,
+  logInLoading: PropTypes.bool.isRequired,
+};
 
 export default App;

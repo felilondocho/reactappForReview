@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { fetchPosts } from '../../../actions/fetchPostsActions';
+import fetchPosts from '../../../actions/fetchPostsActions';
 import Timeline from './Timeline.component';
 
 const mapStateToProps = state => state.fetchPosts;

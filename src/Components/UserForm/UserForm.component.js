@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, Input } from 'antd';
-import { Button } from 'antd';
+import { Form, Input, Button } from 'antd';
+import PropTypes from 'prop-types';
 
 import styles from './UserForm.scss';
 
@@ -9,7 +9,7 @@ const FormItem = Form.Item;
 class UserForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {username: '', password: ''};
+    this.state = { username: '', password: '' };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -24,19 +24,21 @@ class UserForm extends React.Component {
   }
 
   handleSubmit(e) {
+    const { username, password } = this.state;
     const { logIn } = this.props;
     e.preventDefault();
-    logIn({ username: this.state.username, password: this.state.password });
+    logIn({ username, password });
   }
 
   render() {
+    const { username, password } = this.state;
     return (
       <div className={styles.formWrapper}>
         <Form onSubmit={this.handleSubmit} className={styles.loginForm}>
           <FormItem>
             <Input
               placeholder="Username"
-              value={this.state.username}
+              value={username}
               onChange={this.handleUsernameChange}
               required
             />
@@ -45,12 +47,12 @@ class UserForm extends React.Component {
             <Input
               type="password"
               placeholder="Password"
-              value={this.state.password}
+              value={password}
               onChange={this.handlePasswordChange}
               required
             />
           </FormItem>
-          <Button className={styles.loginButton} type="primary" htmlType="submit" >
+          <Button className={styles.loginButton} type="primary" htmlType="submit">
             Log In
           </Button>
         </Form>
@@ -58,5 +60,9 @@ class UserForm extends React.Component {
     );
   }
 }
+
+UserForm.propTypes = {
+  logIn: PropTypes.func.isRequired,
+};
 
 export default UserForm;

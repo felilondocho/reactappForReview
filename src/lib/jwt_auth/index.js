@@ -1,19 +1,20 @@
 export default class JWT_AUTH {
-
-  setToken(tokenValue) {
+  static setToken(tokenValue) {
     sessionStorage.setItem('jwt_id', tokenValue);
   }
 
-  getToken() {
+  static getToken() {
     return sessionStorage.getItem('jwt_id');
   }
 
-  removeToken() {
+  static removeToken() {
     sessionStorage.removeItem('jwt_id');
   }
 
-  loggedIn() {
-    return sessionStorage.getItem('jwt_id') ? true : false;
+  static loggedIn() {
+    if (sessionStorage.getItem('jwt_id')) {
+      return true;
+    }
+    return false;
   }
-
 }

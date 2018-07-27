@@ -1,19 +1,20 @@
 import React from 'react';
 import { Collapse, Alert } from 'antd';
+import PropTypes from 'prop-types';
 
 import styles from './Card.scss';
 
 import Comment from '../Comment';
 
-const Panel = Collapse.Panel;
-
 const collapseCallback = (postId, fetchComments, comments) => {
-  (!comments[postId]) && (fetchComments({ postId }));
+  if (!comments[postId]) {
+    fetchComments({ postId });
+  }
 };
 
 const commentBlock = (comments, postId) => (
-  comments[postId].map((comment, index) => (
-    <Comment key={index} comment={comment} />
+  comments[postId].map(comment => (
+    <Comment key={comment.id} comment={comment} />
   ))
 );
 
@@ -34,26 +35,61 @@ const Card = ({
 }) => {
   const displayLoader = fetchingComments && !(comments[post.id]);
   const displayContent = comments[post.id] && !fetchCommentsError;
-  const displayNoContent = comments[post.id] && comments[post.id].length < 0 
-                            && !fetchError && !isFetching;
+  const displayNoContent = comments[post.id] && comments[post.id].length < 0
+                            && !fetchCommentsError && !fetchingComments;
 
   return (
     <div className={styles.card}>
-      <p>{post.id}</p>
-      <h3>{post.title}</h3>
-      <p>{post.body}</p>
+      <p>
+        {post.id}
+      </p>
+      <h3>
+        {post.title}
+      </h3>
+      <p>
+        {post.body}
+      </p>
       <Collapse
         onChange={() => collapseCallback(post.id, fetchComments, comments)}
       >
-        <Panel header="Comments">
+        <Collapse.Panel header="Comments">
           {fetchCommentsError && (errorInCommentsFetch(fetchCommentsError))}
-          {displayLoader && (<h3>Loading Comments...</h3>)}
-          {displayNoContent && (<h3>No comments to display</h3>)}
+          {displayLoader && (
+            <h3>
+              Loading Comments...
+            </h3>
+          )}
+          {displayNoContent && (
+            <h3>
+              No comments to display
+            </h3>
+          )}
           {displayContent && (commentBlock(comments, post.id))}
-        </Panel>
+        </Collapse.Panel>
       </Collapse>
     </div>
   );
+};
+
+Card.propTypes = {
+  post: PropTypes.shape({
+    userId: PropTypes.number,
+    id: PropTypes.number,
+    title: PropTypes.string,
+    body: PropTypes.string,
+  }).isRequired,
+  fetchComments: PropTypes.func.isRequired,
+  comments: PropTypes.shape({
+    postId: PropTypes.arrayOf(PropTypes.shape({
+      postId: PropTypes.number,
+      id: PropTypes.number,
+      name: PropTypes.string,
+      email: PropTypes.string,
+      body: PropTypes.string,
+    })),
+  }).isRequired,
+  fetchingComments: PropTypes.bool.isRequired,
+  fetchCommentsError: PropTypes.string.isRequired,
 };
 
 export default Card;

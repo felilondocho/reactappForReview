@@ -6,42 +6,44 @@ import {
 
 import JWB_AUTH from '../lib/jwt_auth';
 
-var jwt_instance = new JWB_AUTH();
+let requestPosts;
+let successfulFetch;
+let failedFetch;
 
-export function fetchPosts(currentInitChunk, currentEndChunk) {
-  return dispatch => {
+export default function fetchPosts(currentInitChunk, currentEndChunk) {
+  return ((dispatch) => {
     dispatch(requestPosts());
-    return fetch("http://localhost:3000/getPosts", {
+    return fetch('http://localhost:3000/getPosts', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': jwt_instance.getToken(),
+        Authorization: JWB_AUTH.getToken(),
       },
       body: JSON.stringify({ currentInitChunk, currentEndChunk }),
     })
-    .then(response => Promise.all([response.ok, response.json()]))
-    .then(([responseOk, body]) => {
-      if (responseOk) {
-        dispatch(successfulFetch(body));
-      } else {
-        dispatch(failedFetch(body.error));
-      }
-    })
-    .catch(() => {
-      dispatch(failedFetch("Server error"));
-    });
-  };
+      .then(response => Promise.all([response.ok, response.json()]))
+      .then(([responseOk, body]) => {
+        if (responseOk) {
+          dispatch(successfulFetch(body));
+        } else {
+          dispatch(failedFetch(body.error));
+        }
+      })
+      .catch(() => {
+        dispatch(failedFetch('Server error'));
+      });
+  });
 }
 
-const requestPosts = () => ({
+requestPosts = () => ({
   type: REQUEST_POST,
-})
+});
 
-const successfulFetch = payload => ({
+successfulFetch = payload => ({
   type: SUCCESS_FETCH_POSTS, payload,
 });
 
-const failedFetch = error => ({
+failedFetch = error => ({
   type: FAIL_FETCH_POSTS, payload: error,
 });
