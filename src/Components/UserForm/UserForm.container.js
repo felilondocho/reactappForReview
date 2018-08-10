@@ -10,4 +10,4 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({ logIn }, dispatch)
 );
 
-export default (connect(mapStateToProps, mapDispatchToProps)(UserForm));
+export default connect(mapStateToProps, mapDispatchToProps)(UserForm);

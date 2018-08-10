@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import styles from './App.scss';
 import Header from '../Header';
 import UserForm from '../UserForm';
-import Timeline from '../Timeline/Timeline';
+import Timeline from '../Timeline';
 
 const LoggedInBlock = () => (
   <div className={styles.contentWrapper}>

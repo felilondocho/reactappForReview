@@ -5,88 +5,76 @@ import PropTypes from 'prop-types';
 import styles from './Card.scss';
 
 import Comment from '../Comment';
+import { postType, commentType } from '../../../types';
 
-const collapseCallback = (postId, fetchComments, comments) => {
-  if (!comments[postId]) {
-    fetchComments({ postId });
-  }
-};
-
-const commentBlock = (comments, postId) => (
-  comments[postId].map(comment => (
+class Card extends React.Component {
+  commentBlock = (comments, postId) => comments[postId].map(comment => (
     <Comment key={comment.id} comment={comment} />
-  ))
-);
+  ));
 
-const errorInCommentsFetch = fetchCommentsError => (
-  <Alert
-    className={styles.loginError}
-    message={fetchCommentsError}
-    type="error"
-  />
-);
+  collapseCallback = (postId) => {
+    const { fetchComments, comments } = this.props;
+    if (!comments[postId]) {
+      fetchComments({ postId });
+    }
+  };
 
-const Card = ({
-  post,
-  fetchComments,
-  comments,
-  fetchingComments,
-  fetchCommentsError,
-}) => {
-  const displayLoader = fetchingComments && !(comments[post.id]);
-  const displayContent = comments[post.id] && !fetchCommentsError;
-  const displayNoContent = comments[post.id] && comments[post.id].length < 0
-                            && !fetchCommentsError && !fetchingComments;
-
-  return (
-    <div className={styles.card}>
-      <p>
-        {post.id}
-      </p>
-      <h3>
-        {post.title}
-      </h3>
-      <p>
-        {post.body}
-      </p>
-      <Collapse
-        onChange={() => collapseCallback(post.id, fetchComments, comments)}
-      >
-        <Collapse.Panel header="Comments">
-          {fetchCommentsError && (errorInCommentsFetch(fetchCommentsError))}
-          {displayLoader && (
-            <h3>
-              Loading Comments...
-            </h3>
-          )}
-          {displayNoContent && (
-            <h3>
-              No comments to display
-            </h3>
-          )}
-          {displayContent && (commentBlock(comments, post.id))}
-        </Collapse.Panel>
-      </Collapse>
-    </div>
+  errorInCommentsFetch = fetchCommentsError => (
+    <Alert
+      className={styles.loginError}
+      message={fetchCommentsError}
+      type="error"
+    />
   );
-};
+
+  render() {
+    const {
+      post, comments, fetchingComments, fetchCommentsError,
+    } = this.props;
+    const displayLoader = fetchingComments && !(comments[post.id]);
+    const displayContent = comments[post.id] && !fetchCommentsError;
+    const displayNoContent = comments[post.id] && comments[post.id].length < 0
+      && !fetchCommentsError && !fetchingComments;
+    return (
+      <div className={styles.card}>
+        <p>
+          {post.id}
+        </p>
+        <h3>
+          {post.title}
+        </h3>
+        <p>
+          {post.body}
+        </p>
+        <Collapse
+          data-post={post.id}
+          onChange={() => this.collapseCallback(post.id)}
+        >
+          <Collapse.Panel header="Comments">
+            {fetchCommentsError && this.errorInCommentsFetch(fetchCommentsError)}
+            {displayLoader && (
+              <h3>
+                Loading Comments...
+              </h3>
+            )}
+            {displayNoContent && (
+              <h3>
+                No comments to display
+              </h3>
+            )}
+            {displayContent && this.commentBlock(comments, post.id)}
+          </Collapse.Panel>
+        </Collapse>
+      </div>
+    );
+  }
+}
 
 Card.propTypes = {
-  post: PropTypes.shape({
-    userId: PropTypes.number,
-    id: PropTypes.number,
-    title: PropTypes.string,
-    body: PropTypes.string,
-  }).isRequired,
+  post: postType.isRequired,
   fetchComments: PropTypes.func.isRequired,
   comments: PropTypes.shape({
-    postId: PropTypes.arrayOf(PropTypes.shape({
-      postId: PropTypes.number,
-      id: PropTypes.number,
-      name: PropTypes.string,
-      email: PropTypes.string,
-      body: PropTypes.string,
-    })),
+    postId: PropTypes.arrayOf(commentType),
   }).isRequired,
   fetchingComments: PropTypes.bool.isRequired,
   fetchCommentsError: PropTypes.string.isRequired,

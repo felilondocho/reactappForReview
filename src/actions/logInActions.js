@@ -6,22 +6,25 @@ import {
 } from './actionTypes';
 
 import JWB_AUTH from '../lib/jwt_auth';
+import apiService from '../lib/apiService';
 
-let sendLogInInfo;
-let successfulLogIn;
-let failedLogIn;
+const sendLogInInfo = () => ({
+  type: LOG_IN_REQUEST,
+});
+
+const successfulLogIn = (jwtId) => {
+  JWB_AUTH.setToken(jwtId);
+  return { type: LOG_IN_SUCCESSFUL };
+};
+
+const failedLogIn = error => ({
+  type: LOG_IN_FAIL, payload: error,
+});
 
 export function logIn(logInInfo) {
   return ((dispatch) => {
     dispatch(sendLogInInfo());
-    return fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(logInInfo),
-    })
+    return fetch('http://localhost:3000/login', apiService(logInInfo))
       .then(response => Promise.all([response.ok, response.text()]))
       .then(([responseOk, body]) => {
         if (responseOk) {
@@ -36,22 +39,7 @@ export function logIn(logInInfo) {
   });
 }
 
-sendLogInInfo = () => ({
-  type: LOG_IN_REQUEST,
+export const checkToken = () => ({
+  type: CHECK_INITIAL_TOKEN,
+  payload: JWB_AUTH.loggedIn(),
 });
-
-successfulLogIn = (jwtId) => {
-  JWB_AUTH.setToken(jwtId);
-  return { type: LOG_IN_SUCCESSFUL };
-};
-
-failedLogIn = error => ({
-  type: LOG_IN_FAIL, payload: error,
-});
-
-export function checkToken() {
-  return {
-    type: CHECK_INITIAL_TOKEN,
-    payload: JWB_AUTH.loggedIn(),
-  };
-}

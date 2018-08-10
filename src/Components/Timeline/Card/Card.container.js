@@ -10,4 +10,4 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({ fetchComments }, dispatch)
 );
 
-export default (connect(mapStateToProps, mapDispatchToProps)(Card));
+export default connect(mapStateToProps, mapDispatchToProps)(Card);

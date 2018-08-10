@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import styles from './Comment.scss';
+import { commentType } from '../../../types';
 
 const Comment = ({ comment }) => (
   <div className={styles.comment}>
@@ -18,13 +18,7 @@ const Comment = ({ comment }) => (
 );
 
 Comment.propTypes = {
-  comment: PropTypes.shape({
-    postId: PropTypes.number,
-    id: PropTypes.number,
-    name: PropTypes.string,
-    email: PropTypes.string,
-    body: PropTypes.string,
-  }).isRequired,
+  comment: commentType.isRequired,
 };
 
 export default Comment;

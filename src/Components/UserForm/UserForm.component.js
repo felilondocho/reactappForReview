@@ -7,50 +7,39 @@ import styles from './UserForm.scss';
 const FormItem = Form.Item;
 
 class UserForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { username: '', password: '' };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleUsernameChange = this.handleUsernameChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-  }
-
-  handleUsernameChange(e) {
-    this.setState({ username: e.target.value });
-  }
-
-  handlePasswordChange(e) {
-    this.setState({ password: e.target.value });
-  }
-
-  handleSubmit(e) {
-    const { username, password } = this.state;
-    const { logIn } = this.props;
+  handleSubmit = (e) => {
+    const { form } = this.props;
     e.preventDefault();
-    logIn({ username, password });
+    form.validateFields((err, values) => {
+      if (!err) {
+        const { logIn } = this.props;
+        const { username, password } = values;
+        logIn({ username, password });
+      }
+    });
   }
 
   render() {
-    const { username, password } = this.state;
+    const { form } = this.props;
+    const { getFieldError, isFieldTouched, getFieldDecorator } = form;
+    const userNameError = isFieldTouched('username') && getFieldError('userName');
+    const passwordError = isFieldTouched('password') && getFieldError('password');
     return (
       <div className={styles.formWrapper}>
         <Form onSubmit={this.handleSubmit} className={styles.loginForm}>
-          <FormItem>
-            <Input
-              placeholder="Username"
-              value={username}
-              onChange={this.handleUsernameChange}
-              required
-            />
+          <FormItem validateStatus={userNameError ? 'error' : ''}>
+            {getFieldDecorator('username', {
+              rules: [{ required: true, message: 'Please input your username!' }],
+            })(
+              <Input placeholder="Username" />,
+            )}
           </FormItem>
-          <FormItem>
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={this.handlePasswordChange}
-              required
-            />
+          <FormItem validateStatus={passwordError ? 'error' : ''}>
+            {getFieldDecorator('password', {
+              rules: [{ required: true, message: 'Please input your password!' }],
+            })(
+              <Input type="password" placeholder="Password" />,
+            )}
           </FormItem>
           <Button className={styles.loginButton} type="primary" htmlType="submit">
             Log In
@@ -65,4 +54,4 @@ UserForm.propTypes = {
   logIn: PropTypes.func.isRequired,
 };
 
-export default UserForm;
+export default Form.create()(UserForm);

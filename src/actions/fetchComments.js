@@ -5,23 +5,25 @@ import {
 } from './actionTypes';
 
 import JWB_AUTH from '../lib/jwt_auth';
+import apiService from '../lib/apiService';
 
-let requestComments;
-let successfulFetchComments;
-let failedFetchComments;
+const requestComments = () => ({
+  type: REQUEST_COMMENTS,
+});
+
+const successfulFetchComments = payload => ({
+  type: SUCCESS_FETCH_COMMENTS, payload: { [payload[0].postId]: payload },
+});
+
+const failedFetchComments = error => ({
+  type: FAIL_FETCH_COMMENTS, payload: error,
+});
 
 export default function fetchComments(postId) {
   return ((dispatch) => {
     dispatch(requestComments());
-    return fetch('http://localhost:3000/getComments/', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: JWB_AUTH.getToken(),
-      },
-      body: JSON.stringify(postId),
-    })
+    return fetch('http://localhost:3000/getComments/',
+      apiService(postId, JWB_AUTH.getToken()))
       .then(response => Promise.all([response.ok, response.json()]))
       .then(([responseOk, body]) => {
         if (responseOk) {
@@ -35,15 +37,3 @@ export default function fetchComments(postId) {
       });
   });
 }
-
-requestComments = () => ({
-  type: REQUEST_COMMENTS,
-});
-
-successfulFetchComments = payload => ({
-  type: SUCCESS_FETCH_COMMENTS, payload: { [payload[0].postId]: payload },
-});
-
-failedFetchComments = error => ({
-  type: FAIL_FETCH_COMMENTS, payload: error,
-});
